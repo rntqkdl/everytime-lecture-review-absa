@@ -1,0 +1,22 @@
+# scraping
+playwright
+beautifulsoup4
+pandas
+numpy
+joblib
+tqdm
+lxml
+openpyxl
+
+# local analysis pipeline
+PyYAML
+scikit-learn
+kiwipiepy
+matplotlib
+
+# Colab / optional local model inference
+transformers
+torch
+
+# tests
+pytest

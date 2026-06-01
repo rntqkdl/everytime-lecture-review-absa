@@ -1,0 +1,139 @@
+project_root: "C:/every_time"
+
+input_dirs:
+  - "C:/every_time/data/writing_output"
+  - "C:/every_time/data/practical_english_output"
+  - "C:/every_time/data/practical_english_variants_output"
+
+output_dirs:
+  processed: "C:/every_time/outputs/processed"
+  colab_input: "C:/every_time/outputs/colab_input"
+  colab_results: "C:/every_time/outputs/colab_results"
+  aspects: "C:/every_time/outputs/aspects"
+  sentiment: "C:/every_time/outputs/sentiment"
+  insights: "C:/every_time/outputs/insights"
+  figures: "C:/every_time/outputs/figures"
+  models_cpu: "C:/every_time/outputs/models_cpu"
+  summary: "C:/every_time/outputs/summary"
+
+privacy:
+  anonymize_professor: true
+  anonymize_course: false
+  save_raw_text_public: false
+
+preprocess:
+  min_segment_length: 5
+  remove_private_patterns: true
+  normalize_repeated_chars: true
+
+segmentation:
+  split_sentence: true
+  split_contrast_markers: true
+  contrast_markers:
+    - "\uADFC\uB370"
+    - "\uADF8\uB7F0\uB370"
+    - "\uD558\uC9C0\uB9CC"
+    - "\uB2E4\uB9CC"
+    - "\uADF8\uB798\uB3C4"
+    - "\uBC18\uBA74"
+    - "\uC544\uC26C\uC6B4 \uC810\uC740"
+    - "\uC7A5\uC810\uC740"
+    - "\uB2E8\uC810\uC740"
+
+rating_satisfaction_signal:
+  use_as_sentiment_label: false
+  use_as_training_label: false
+  very_high_min: 4.5
+  high_min: 4.0
+  mid_min: 3.0
+  low_min: 2.0
+  unknown_values:
+    - 0
+    - null
+  labels:
+    very_high: "VERY_HIGH_SATISFACTION"
+    high: "HIGH_SATISFACTION"
+    mid: "MID_SATISFACTION"
+    low: "LOW_SATISFACTION"
+    very_low: "VERY_LOW_SATISFACTION"
+    unknown: "RATING_UNKNOWN"
+
+cpu_baseline:
+  enabled: true
+  use_as_main_method: false
+  max_features: 5000
+  n_topics: 10
+  methods:
+    - "nmf"
+    - "lda"
+
+colab_t4:
+  use_gpu: true
+  batch_size_embedding: 128
+  batch_size_sentiment: 32
+  max_length: 128
+  save_every_n_batches: 20
+
+embedding_aspect_discovery:
+  main_method: "sentence_embedding_clustering"
+  default_embedding_model: "jhgan/ko-sroberta-multitask"
+  fallback_embedding_models:
+    - "BM-K/KoSimCSE-roberta-multitask"
+    - "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    - "intfloat/multilingual-e5-base"
+  dim_reduction:
+    method: "umap"
+    n_neighbors: 15
+    n_components: 5
+    min_dist: 0.0
+    metric: "cosine"
+  clustering:
+    primary_method: "hdbscan"
+    fallback_method: "kmeans"
+    min_cluster_size: 10
+    n_clusters_fallback: 10
+  topic_keyword_extraction:
+    method: "bertopic_or_ctfidf"
+    top_n_words: 15
+  representative_segments:
+    top_n: 10
+
+sentiment_models:
+  binary_baseline:
+    - name: "koelectra_nsmc_monologg"
+      hf_model: "monologg/koelectra-base-finetuned-nsmc"
+      task: "binary_sentiment"
+      priority: 1
+    - name: "koelectra_nsmc_documented"
+      hf_model: "cringepnh/koelectra-korean-sentiment"
+      task: "binary_sentiment"
+      priority: 2
+  emotion_extension:
+    - name: "koelectra_kote_44emotion"
+      hf_model: "tobykim/koelectra-44emotions"
+      task: "multi_label_emotion"
+      priority: 1
+    - name: "kluebert_aihub_7emotion"
+      hf_model: "dlckdfuf141/korean-emotion-kluebert-v2"
+      task: "multi_class_emotion"
+      priority: 2
+
+optional_domain_finetuning:
+  enabled_by_default: false
+  run_on_colab_t4: true
+  caution: "Do not use review_rating as direct segment sentiment label."
+  training_unit: "review_level_only_if_enabled"
+  base_models:
+    - "klue/roberta-base"
+    - "monologg/koelectra-base-v3-discriminator"
+    - "beomi/KcELECTRA-base-v2022"
+  epochs: 2
+  batch_size: 16
+  max_length: 128
+
+insight_extraction:
+  min_cluster_size_for_insight: 10
+  good_factor_positive_ratio_min: 0.6
+  dissatisfaction_negative_ratio_min: 0.5
+  representative_sentence_top_n: 5
+  use_rating_signal_as_filter_or_grouping_only: true

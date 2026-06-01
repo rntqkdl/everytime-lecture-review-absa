@@ -1,0 +1,55 @@
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Browser login/session
+browser_profile/
+
+# Temporary files
+.tmp.drivedownload/
+.tmp.driveupload/
+*.tmp
+*.log
+
+# Private raw data
+data/
+outputs/
+
+# Everytime raw/debug data
+*_debug/
+*_lecture_html/
+*.html
+*reviews_raw*.csv
+*private*.csv
+*professor_mapping_private.csv
+
+# Model files
+models/
+checkpoints/
+.cache/
+*.pt
+*.bin
+*.safetensors
+*.pkl
+*.joblib
+
+# Secrets
+.env
+*.env
+credentials.*
+secrets.*
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS / editor
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
