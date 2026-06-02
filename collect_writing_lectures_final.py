@@ -348,7 +348,7 @@ def extract_target_cards_from_current_page(page, search_keyword=None):
                 }
             });
             return result;
-        }
+        }ㅈ
         """,
         {
             "targetNames": TARGET_COURSE_NAMES,
