@@ -1,5 +1,7 @@
 # Python cache
 __pycache__/
+**__pycache__/
+**pycache**/
 *.pyc
 .pytest_cache/
 
@@ -10,21 +12,37 @@ env/
 
 # Browser login/session
 browser_profile/
+colab_upload/
 
 # Temporary files
 .tmp.drivedownload/
 .tmp.driveupload/
 *.tmp
 *.log
+*.jsonl
 
 # Private raw data
 data/
 outputs/
+sample_data/
+submission_pack_안성민/
+appendix_안성민.zip
+submission_pack_안성민.zip
+README_submission.md
+report_validation_summary.md
 
 # Everytime raw/debug data
 *_debug/
 *_lecture_html/
 *.html
+*.csv
+*.xlsx
+*.xls
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.zip
 *reviews_raw*.csv
 *private*.csv
 *professor_mapping_private.csv
@@ -41,9 +59,11 @@ checkpoints/
 
 # Secrets
 .env
+.env.*
 *.env
 credentials.*
 secrets.*
+config/project_config.yaml
 
 # Notebook checkpoints
 .ipynb_checkpoints/

@@ -104,18 +104,43 @@ python scripts\run_segment_absa_pipeline.py --post-colab-only
 - `browser_profile/`
 - `data/`
 - `outputs/`
+- `sample_data/`
+- `submission_pack_안성민/`
+- `appendix_안성민.zip`
+- `submission_pack_안성민.zip`
 - 실제 강의평 원문
 - HTML 원본
 - debug 파일
 - 교수명 매핑 파일
 - Colab 모델 가중치
+- 분석 결과 CSV/XLSX/PNG/PDF
 
 업로드 가능:
 - 분석 코드
 - `README.md`
 - `docs/`
 - `requirements.txt`
-- 마스킹된 `sample_data/`
+- `config/project_config.example.yaml`
+- 출력이 제거된 `notebooks/*.ipynb`와 `notebooks/README.md`
+- `GITHUB_UPLOAD_CHECKLIST.md`
+- `DATA_EXCLUSION_CHECKLIST.md`
+
+## 교수 제출 패키지 생성
+교수 제출용 표, 그림, 검증 파일은 GitHub에 올리지 않고 별도 패키지로 생성한다.
+
+```powershell
+cd C:\every_time
+python make_submission_pack.py
+```
+
+생성 결과:
+- `submission_pack_안성민/`
+- `appendix_안성민.zip`
+- `submission_pack_안성민.zip`
+- `submission_pack_안성민/report_validation_summary.md`
+- `submission_pack_안성민/report_assets/tables/claim_validation_table.csv`
+
+발표자료 수치 검증은 실제 `outputs` 데이터 기준으로 다시 계산한다. 현재 데이터 기준으로 전체 리뷰 수 13,751건, 전체 세그먼트 수 37,808건, 긍정 22,263건, 부정 15,545건, mixed review 5,984건은 발표자료와 일치한다. 다만 별점과 텍스트 불일치 항목에서 발표자료의 `높은 별점의 부정 세그먼트 5,698건`과 `낮은 별점의 긍정 세그먼트 602건`은 unique review 기준 수치와 일치한다. 세그먼트 기준으로는 각각 9,694건과 975건이므로, 보고서에서는 기준을 명확히 적어야 한다.
 
 ## 한계
 외부 감정분석 모델은 강의평 도메인에 최적화된 모델이 아니다. 자동 발견 cluster도 사람이 최종 이름을 검토해야 한다. 별점 만족도 신호는 해석 보조 변수이며, segment 감정 정답이 아니다.
