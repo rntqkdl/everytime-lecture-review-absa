@@ -1197,9 +1197,32 @@ def organize_appendix(
     copy_file(validation_csv, APPENDIX_SUBDIRS["validation"] / "claim_validation_table.csv", missing, "claim validation table validation copy")
     copy_file(summary_path, APPENDIX_SUBDIRS["validation"] / "report_validation_summary.md", missing, "report validation summary appendix copy")
     copy_file(discovered.get("manual_validation_7_samples"), APPENDIX_SUBDIRS["validation"] / "manual_validation_7_samples.csv", missing, "manual validation samples")
+    methodology_docs = [
+        PROJECT_ROOT / "docs" / "methodology_reference_summary.md",
+        PROJECT_ROOT / "docs" / "methodology_writeup_for_report.md",
+        PROJECT_ROOT / "docs" / "methodology_caution_notes.md",
+        PROJECT_ROOT / "docs" / "apa_references_for_report.md",
+    ]
+    for doc_path in methodology_docs:
+        copy_file(doc_path, APPENDIX_SUBDIRS["validation"] / doc_path.name, missing, f"methodology document {doc_path.name}")
+    copy_file(
+        PROJECT_ROOT / "docs" / "methodology_reference_table.csv",
+        APPENDIX_SUBDIRS["tables"] / "methodology_reference_table.csv",
+        missing,
+        "methodology reference table csv",
+    )
+    copy_file(
+        PROJECT_ROOT / "docs" / "methodology_reference_table.xlsx",
+        APPENDIX_SUBDIRS["tables"] / "methodology_reference_table.xlsx",
+        missing,
+        "methodology reference table xlsx",
+    )
 
     code_targets = [
         PROJECT_ROOT / "make_submission_pack.py",
+        PROJECT_ROOT / "scripts" / "18_run_bertopic_report_analysis.py",
+        PROJECT_ROOT / "scripts" / "build_final_report_docx.py",
+        PROJECT_ROOT / "scripts" / "make_methodology_reference_summary.py",
         PROJECT_ROOT / "scripts" / "run_segment_absa_pipeline.py",
         PROJECT_ROOT / "scripts" / "10_visualize_results.py",
         PROJECT_ROOT / "scripts" / "13_generate_report_analysis_direct_colab.py",

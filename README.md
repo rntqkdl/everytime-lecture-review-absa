@@ -1,11 +1,30 @@
 # 에브리타임 강의평 기반 ML/DL 측면 감정분석 파이프라인
 
+## 교수님 검증용 실행 범위
+
+교수님께서 직접 실행하실 범위는 전체 수집/전처리/Colab/보고서 생성이 아니라, 보고서에 작성한 핵심 수치와 분석 근거가 최종 분석 데이터에서 다시 계산되는지 확인하는 것입니다.
+
+1. GitHub 저장소를 내려받습니다.
+2. 별도로 전달하는 `professor_verification_data_안성민.zip`을 저장소 루트에 풉니다.
+3. 의존성을 설치한 뒤 검증 스크립트를 실행합니다.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python scripts\verify_report_evidence.py
+```
+
+검증 결과는 `outputs/professor_verification/`에 생성됩니다. 자세한 안내는 `PROFESSOR_VERIFICATION_GUIDE.md`를 확인하면 됩니다.
+
+검증되는 범위는 BERTopic 결과뿐 아니라 KoELECTRA 감정분석 결과, Colab 문장 임베딩 클러스터 결과, BERTopic 이전 직접 병합 분석 결과, 과목군 비교, 좋은 강의 요인과 부정/불만 요인까지 포함합니다.
+
 ## 연구 목적
 이 프로젝트는 에브리타임 강의평을 문장/절 단위로 나누고, Colab T4 GPU 기반 문장 임베딩 클러스터링과 한국어 감정분석 모델을 활용해 한 리뷰 안에 섞여 있는 여러 평가 요인과 감정을 분리한다.
 
 본 프로젝트는 별점을 문장/절 단위 감정 라벨로 사용하지 않는다. 별점은 리뷰 전체 만족도를 나타내는 보조 신호로만 사용하며, 실제 감정분석은 문장/절 단위에서 기존 한국어 감정분석 모델을 통해 수행한다.
 
-본 프로젝트는 TF-IDF 기반 키워드 매칭을 최종 분류 방식으로 사용하지 않는다. TF-IDF는 선택적 baseline으로만 사용하며, 최종 평가 요인 발견은 SentenceTransformer 기반 문장 임베딩, UMAP/HDBSCAN 클러스터링, BERTopic 또는 c-TF-IDF 키워드 추출을 중심으로 수행한다.
+본 프로젝트는 TF-IDF 기반 키워드 매칭을 최종 분류 방식으로 사용하지 않는다. TF-IDF는 선택적 baseline이나 topic representation 보조로만 사용하며, 최종 평가 요인 발견은 BERTopic 라이브러리 기반 문장 임베딩, UMAP/HDBSCAN 클러스터링, c-TF-IDF topic representation, 연구자 해석을 중심으로 수행한다.
 
 본 프로젝트는 CARBD-Ko처럼 문장 전체 감정과 측면별 감정을 구분해야 한다는 문제의식을 따른다. 다만 별도의 수작업 aspect 주석 데이터셋을 구축하지 않고, 에브리타임 강의평의 별점 기반 만족도 신호와 문장 임베딩 기반 aspect discovery를 결합하여 자동화된 측면 감정분석 파이프라인을 구현한다.
 
@@ -38,7 +57,7 @@ Colab T4 GPU:
 1. SentenceTransformer 임베딩
 2. UMAP 차원 축소
 3. HDBSCAN 또는 KMeans 클러스터링
-4. BERTopic 또는 c-TF-IDF 키워드 추출
+4. BERTopic 기반 c-TF-IDF topic representation
 5. KoELECTRA/KOTE/KLUE-BERT 감정 추론
 
 ## 별점 만족도 신호
@@ -57,7 +76,7 @@ Colab T4 GPU:
 
 ## 로컬 CPU 1차 실행
 ```powershell
-cd C:\every_time
+cd <프로젝트_폴더>
 .\.venv\Scripts\Activate.ps1
 python scripts\run_segment_absa_pipeline.py --pre-colab-only
 ```
@@ -75,19 +94,32 @@ Colab에서 `런타임 → 런타임 유형 변경 → 하드웨어 가속기 GP
 2. `notebooks/02_colab_t4_sentiment_inference.ipynb`
 3. 선택: `notebooks/03_colab_t4_optional_domain_finetuning.ipynb`
 
-Colab 결과 CSV를 `C:\every_time\outputs\colab_results`에 넣는다.
+Colab 결과 CSV를 `outputs/colab_results`에 넣는다.
 
 ## 로컬 CPU 2차 실행
 ```powershell
 python scripts\run_segment_absa_pipeline.py --post-colab-only
 ```
 
-개별 실행이 필요하면 [current_pipeline_process.md](C:/every_time/docs/current_pipeline_process.md)를 확인한다.
+개별 실행이 필요하면 `docs/current_pipeline_process.md`를 확인한다.
+
+## BERTopic 최종 분석
+기존 Colab 결과와 감정분석 결과를 바탕으로 최종 보고서용 평가 요인은 BERTopic 라이브러리로 재분석한다.
+
+```powershell
+python scripts\18_run_bertopic_report_analysis.py
+python make_submission_pack.py
+python scripts\build_final_report_docx.py
+```
+
+BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다. `outputs/`는 GitHub 업로드 대상이 아니며, 교수 제출용 파일은 `submission_pack_안성민.zip`, `appendix_안성민.zip`, `final_report_안성민.docx`로 별도 관리한다.
 
 ## 최종 산출물
 - `outputs/aspects/aspect_cluster_keywords.csv`
 - `outputs/aspects/aspect_representative_segments.csv`
 - `outputs/sentiment/segment_aspect_sentiment_merged.csv`
+- `outputs/bertopic_analysis/report_analysis/segment_aspect_sentiment_merged_DIRECT_CHECK.csv`
+- `outputs/bertopic_analysis/bertopic_topic_info.csv`
 - `outputs/sentiment/mixed_sentiment_reviews.csv`
 - `outputs/sentiment/high_rating_negative_segments.csv`
 - `outputs/sentiment/low_rating_positive_segments.csv`
@@ -129,7 +161,7 @@ python scripts\run_segment_absa_pipeline.py --post-colab-only
 교수 제출용 표, 그림, 검증 파일은 GitHub에 올리지 않고 별도 패키지로 생성한다.
 
 ```powershell
-cd C:\every_time
+cd <프로젝트_폴더>
 python make_submission_pack.py
 ```
 
