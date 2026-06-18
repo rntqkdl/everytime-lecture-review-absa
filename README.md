@@ -1,11 +1,11 @@
 # 에브리타임 강의평 기반 ML/DL 측면 감정분석 파이프라인
 
-## 교수님 검증용 실행 범위
+## 최종 분석 근거 검증 실행
 
-교수님께서 직접 실행하실 범위는 전체 수집/전처리/Colab/보고서 생성이 아니라, 보고서에 작성한 핵심 수치와 분석 근거가 최종 분석 데이터에서 다시 계산되는지 확인하는 것입니다.
+이 저장소의 검증 실행 범위는 전체 수집/전처리/Colab/보고서 생성을 반복하는 것이 아니라, 보고서에 작성한 핵심 수치와 분석 근거가 최종 분석 데이터에서 다시 계산되는지 확인하는 것이다.
 
 1. GitHub 저장소를 내려받습니다.
-2. 별도로 전달하는 `professor_verification_data_안성민.zip`을 저장소 루트에 풉니다.
+2. 검증 데이터 파일 `evidence_verification_data_안성민.zip`을 저장소 루트에 풉니다.
 3. 의존성을 설치한 뒤 검증 스크립트를 실행합니다.
 
 ```powershell
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 python scripts\verify_report_evidence.py
 ```
 
-검증 결과는 `outputs/professor_verification/`에 생성됩니다. 자세한 안내는 `PROFESSOR_VERIFICATION_GUIDE.md`를 확인하면 됩니다.
+검증 결과는 `outputs/evidence_verification/`에 생성됩니다. 자세한 안내는 `VERIFICATION_GUIDE.md`를 확인하면 됩니다.
 
 검증되는 범위는 BERTopic 결과뿐 아니라 KoELECTRA 감정분석 결과, Colab 문장 임베딩 클러스터 결과, BERTopic 이전 직접 병합 분석 결과, 과목군 비교, 좋은 강의 요인과 부정/불만 요인까지 포함합니다.
 
@@ -112,7 +112,7 @@ python make_submission_pack.py
 python scripts\build_final_report_docx.py
 ```
 
-BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다. `outputs/`는 GitHub 업로드 대상이 아니며, 교수 제출용 파일은 `submission_pack_안성민.zip`, `appendix_안성민.zip`, `final_report_안성민.docx`로 별도 관리한다.
+BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다. `outputs/`는 GitHub 업로드 대상이 아니며, 최종 문서와 분석 산출물 압축본은 로컬 산출물로 별도 관리한다.
 
 ## 최종 산출물
 - `outputs/aspects/aspect_cluster_keywords.csv`
@@ -137,9 +137,9 @@ BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다
 - `data/`
 - `outputs/`
 - `sample_data/`
-- `submission_pack_안성민/`
-- `appendix_안성민.zip`
-- `submission_pack_안성민.zip`
+- 로컬 분석 산출물 폴더
+- 최종 문서 파일
+- 분석 산출물 압축본
 - 실제 강의평 원문
 - HTML 원본
 - debug 파일
@@ -157,8 +157,8 @@ BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다
 - `GITHUB_UPLOAD_CHECKLIST.md`
 - `DATA_EXCLUSION_CHECKLIST.md`
 
-## 교수 제출 패키지 생성
-교수 제출용 표, 그림, 검증 파일은 GitHub에 올리지 않고 별도 패키지로 생성한다.
+## 분석 산출물 패키지 생성
+보고서에 사용할 표, 그림, 검증 파일은 GitHub에 올리지 않고 로컬 산출물 패키지로 생성한다.
 
 ```powershell
 cd <프로젝트_폴더>
@@ -172,7 +172,7 @@ python make_submission_pack.py
 - `submission_pack_안성민/report_validation_summary.md`
 - `submission_pack_안성민/report_assets/tables/claim_validation_table.csv`
 
-발표자료 수치 검증은 실제 `outputs` 데이터 기준으로 다시 계산한다. 현재 데이터 기준으로 전체 리뷰 수 13,751건, 전체 세그먼트 수 37,808건, 긍정 22,263건, 부정 15,545건, mixed review 5,984건은 발표자료와 일치한다. 다만 별점과 텍스트 불일치 항목에서 발표자료의 `높은 별점의 부정 세그먼트 5,698건`과 `낮은 별점의 긍정 세그먼트 602건`은 unique review 기준 수치와 일치한다. 세그먼트 기준으로는 각각 9,694건과 975건이므로, 보고서에서는 기준을 명확히 적어야 한다.
+최종 보고서의 핵심 수치는 실제 `outputs` 데이터 기준으로 다시 계산한다. 현재 데이터 기준으로 전체 리뷰 수 13,751건, 전체 세그먼트 수 37,808건, 긍정 22,263건, 부정 15,545건, mixed review 5,984건이 재계산된다. 별점과 텍스트 불일치 항목은 기준 단위에 따라 값이 달라지므로, 높은 별점의 부정 사례는 세그먼트 기준 9,694건과 리뷰 기준 5,698건, 낮은 별점의 긍정 사례는 세그먼트 기준 975건과 리뷰 기준 602건으로 구분한다.
 
 ## 한계
 외부 감정분석 모델은 강의평 도메인에 최적화된 모델이 아니다. 자동 발견 cluster도 사람이 최종 이름을 검토해야 한다. 별점 만족도 신호는 해석 보조 변수이며, segment 감정 정답이 아니다.

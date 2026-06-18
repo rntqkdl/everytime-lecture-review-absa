@@ -302,7 +302,7 @@ def add_cover(doc: Document) -> None:
 
     meta = [
         ("과목명", "언어와 데이터 리터러시"),
-        ("담당 교수", "김정은 교수님"),
+        ("담당 교수", "김정은 교수"),
         ("학과", "IT융합기전공학과"),
         ("학번", "201911347"),
         ("이름", "안성민"),
@@ -356,7 +356,7 @@ def add_design_process(doc: Document, data: dict[str, pd.DataFrame]) -> None:
         doc,
         "데이터 수집은 `collect_writing_lectures_final.py`, `collect_practical_english_lectures_final.py`, "
         "`collect_practical_english_variants_final.py`를 통해 수행했다. 이후 Python, pandas, 정규표현식을 사용해 중복과 불필요한 문자를 정리하고, "
-        "분석 가능한 리뷰 텍스트를 구성했다. 교수자 식별 정보는 코드상에서 익명화하거나 별도 식별자로 처리했으며, 원본 리뷰 데이터는 제출 패키지와 GitHub 업로드 대상에서 제외했다.",
+        "분석 가능한 리뷰 텍스트를 구성했다. 교수자 식별 정보는 코드상에서 익명화하거나 별도 식별자로 처리했으며, 원본 리뷰 데이터는 공개 저장소와 최종 문서 본문에서 제외했다.",
     )
 
     add_heading(doc, "2.2 세그먼트 단위 분석", 2)
@@ -421,7 +421,7 @@ def add_results(doc: Document, data: dict[str, pd.DataFrame]) -> None:
         doc,
         "mixed review는 하나의 리뷰 안에 긍정 세그먼트와 부정 세그먼트가 모두 포함된 경우로 정의했다. 실제 데이터에서 mixed review는 5,984개였다. "
         "또한 높은 별점이지만 부정 세그먼트를 포함한 경우는 세그먼트 기준 9,694건, 낮은 별점이지만 긍정 세그먼트를 포함한 경우는 세그먼트 기준 975건이었다. "
-        "기존 발표자료의 5,698건과 602건은 세그먼트 수가 아니라 unique review 기준 수치와 일치하므로, 본 보고서에서는 기준을 구분해 기술한다.",
+        "이 항목은 세그먼트 기준과 리뷰 기준의 값이 다르게 계산되므로, 본 보고서에서는 두 기준을 구분해 기술한다.",
     )
     add_dataframe_table(doc, data["mismatch"], widths=[3300, 1900, 1900, 2260])
     add_caption(doc, "표 4. 별점과 텍스트 불일치 요약")
@@ -519,7 +519,7 @@ def add_appendix(doc: Document) -> None:
     add_heading(doc, "7. 부록", 1)
     add_para(
         doc,
-        "부록은 GitHub 업로드용 코드와 별도로 `submission_pack_안성민` 및 `appendix_안성민.zip`에 정리했다. "
+        "부록 자료는 공개 저장소의 코드와 분리해 로컬 분석 산출물로 정리했다. "
         "원본 리뷰 데이터, HTML 원본, 브라우저 프로필, 캐시, 환경 파일은 개인정보와 재현 환경 보호를 위해 제외했다.",
     )
     add_bullet(doc, "`appendix/data`: 최종 분석 데이터셋, 최종 요인 요약, 과목군 비교, 검증표")

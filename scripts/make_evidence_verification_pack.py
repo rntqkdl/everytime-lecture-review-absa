@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PACK_NAME = "professor_verification_data_안성민"
+PACK_NAME = "evidence_verification_data_안성민"
 PACK_DIR = ROOT / PACK_NAME
 ZIP_PATH = ROOT / f"{PACK_NAME}.zip"
 
@@ -48,14 +48,14 @@ INCLUDE_FILES = [
 ]
 
 
-README = """# 교수님 검증용 최종 분석 데이터
+README = """# 최종 분석 근거 검증 데이터
 
-이 압축 파일은 GitHub에 올리지 않고 별도로 전달하는 검증용 데이터입니다.
+이 압축 파일은 최종 분석 근거 검증에 필요한 데이터만 모아 둔 파일입니다.
 
 ## 목적
 
-교수님이 보고서에 적힌 주요 수치와 분석 근거가 실제 최종 데이터에서 다시 계산되는지 확인할 수 있도록 구성했습니다.
-보고서 DOCX 재생성, 제출 패키지 생성, 에브리타임 재수집, Colab 재실행은 교수님 실행 범위가 아닙니다.
+보고서에 적힌 주요 수치와 분석 근거가 실제 최종 데이터에서 다시 계산되는지 확인할 수 있도록 구성했습니다.
+보고서 DOCX 재생성, 분석 산출물 압축본 생성, 에브리타임 재수집, Colab 재실행은 이 검증 실행 범위에 포함하지 않습니다.
 
 ## 사용 방법
 
@@ -76,7 +76,7 @@ pip install -r requirements.txt
 python scripts\\verify_report_evidence.py
 ```
 
-5. 결과는 `outputs/professor_verification/`에 생성됩니다.
+5. 결과는 `outputs/evidence_verification/`에 생성됩니다.
 
 ## 생성되는 검증 결과
 
@@ -102,7 +102,7 @@ python scripts\\verify_report_evidence.py
 - 브라우저 프로필과 로그인 세션
 - 가상환경과 캐시
 - BERTopic 임베딩 캐시 `.npy`
-- 보고서 DOCX와 제출 패키지 zip
+- 보고서 DOCX와 분석 산출물 압축본
 
 생성 시각: {created_at}
 """
@@ -145,7 +145,7 @@ def main() -> None:
         copy_file(rel_path, missing)
 
     readme = README.format(created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    (PACK_DIR / "README_PROFESSOR_VERIFICATION_DATA.md").write_text(readme, encoding="utf-8")
+    (PACK_DIR / "README_EVIDENCE_VERIFICATION_DATA.md").write_text(readme, encoding="utf-8")
 
     if missing:
         missing_text = "\n".join(f"- {item}" for item in missing)

@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> None:
     print(
-        "This project does not ask the professor to regenerate the report or submission package.\n"
-        "Running the professor-facing final analysis verification instead.\n"
+        "This command runs final analysis evidence verification only.\n"
+        "It does not regenerate the report document or local analysis archive.\n"
     )
     subprocess.run([sys.executable, "scripts/verify_report_evidence.py"], cwd=ROOT, check=True)
 

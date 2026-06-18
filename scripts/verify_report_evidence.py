@@ -12,7 +12,7 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT_DIR = ROOT / "outputs" / "professor_verification"
+DEFAULT_OUTPUT_DIR = ROOT / "outputs" / "evidence_verification"
 
 FINAL_SEGMENT_PATH = ROOT / "outputs" / "bertopic_analysis" / "report_analysis" / "segment_aspect_sentiment_merged_DIRECT_CHECK.csv"
 LEGACY_SEGMENT_PATH = ROOT / "outputs" / "report_analysis" / "segment_aspect_sentiment_merged_DIRECT_CHECK.csv"
@@ -84,7 +84,7 @@ def require_file(path: Path) -> None:
     if not path.exists():
         raise FileNotFoundError(
             f"필수 검증 데이터가 없습니다: {path}\n"
-            "교수님용 검증 데이터 zip을 프로젝트 루트에 풀어 같은 경로 구조를 맞춘 뒤 다시 실행하세요."
+            "검증 데이터 zip을 프로젝트 루트에 풀어 같은 경로 구조를 맞춘 뒤 다시 실행하세요."
         )
 
 
@@ -404,7 +404,7 @@ def build_summary(
     top_bad = top_df[top_df["검증 영역"].eq("부정/불만 요인")].head(3) if not top_df.empty else pd.DataFrame()
 
     lines = [
-        "# 교수님 검증용 최종 분석 근거 확인 요약",
+        "# 최종 분석 근거 검증 요약",
         "",
         f"- 생성 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"- 검증 수치 일치: {matched}/{total}",
