@@ -345,8 +345,7 @@ def add_design_process(doc: Document, data: dict[str, pd.DataFrame]) -> None:
     add_para(
         doc,
         "분석은 데이터 수집, 전처리, 세그먼트 분리, 문장 임베딩, 평가 요인 군집화, 감정분석, 결과 해석의 순서로 진행했다. "
-        "원본 리뷰 데이터와 HTML 원본은 개인정보 가능성과 저작권·윤리 문제를 고려해 GitHub 업로드 대상에서 제외하고, "
-        "보고서에는 집계 결과와 검증 가능한 표·그래프만 사용했다.",
+        "원본 리뷰와 HTML 파일은 분석 과정에서만 사용했고, 보고서에는 개인 식별 가능성이 있는 원문 대신 집계 수치와 시각자료를 중심으로 제시했다.",
     )
     doc.add_picture(str(FIGURES_DIR / "fig01_analysis_process_flow.png"), width=Inches(6.3))
     add_caption(doc, "그림 1. 분석 과정 흐름도")
@@ -356,7 +355,7 @@ def add_design_process(doc: Document, data: dict[str, pd.DataFrame]) -> None:
         doc,
         "데이터 수집은 `collect_writing_lectures_final.py`, `collect_practical_english_lectures_final.py`, "
         "`collect_practical_english_variants_final.py`를 통해 수행했다. 이후 Python, pandas, 정규표현식을 사용해 중복과 불필요한 문자를 정리하고, "
-        "분석 가능한 리뷰 텍스트를 구성했다. 교수자 식별 정보는 코드상에서 익명화하거나 별도 식별자로 처리했으며, 원본 리뷰 데이터는 공개 저장소와 최종 문서 본문에서 제외했다.",
+        "분석 가능한 리뷰 텍스트를 구성했다. 교수자 식별 정보는 별도 식별자로 처리하고, 최종 보고서에서는 개별 원문보다 집계 결과와 대표적인 패턴을 중심으로 서술했다.",
     )
 
     add_heading(doc, "2.2 세그먼트 단위 분석", 2)
@@ -367,26 +366,24 @@ def add_design_process(doc: Document, data: dict[str, pd.DataFrame]) -> None:
     )
 
     add_heading(doc, "2.3 실제 사용 방법과 참고 방법의 구분", 2)
-    method_ref = data["method_ref"]
-    brief = method_ref[
-        method_ref["방법론 또는 모델명"].isin(
-            [
-                "jhgan/ko-sroberta-multitask",
-                "UMAP",
-                "HDBSCAN",
-                "BERTopic",
-                "monologg/koelectra-base-finetuned-nsmc",
-                "별점 신호 분석",
-                "EduRABSA",
-            ]
-        )
-    ][["방법론 또는 모델명", "직접 사용 여부", "레포트에 넣을 표현"]]
-    add_dataframe_table(doc, brief, widths=[2500, 1700, 5160])
-    add_caption(doc, "표 1. 실제 사용 방법과 참고 방법의 구분")
+    method_table = pd.DataFrame(
+        [
+            ["Python, pandas", "전처리와 집계", "수집된 리뷰를 정리하고 분석 단위별 수치를 계산했다."],
+            ["문장·절 단위 분리", "세그먼트 구성", "한 리뷰 안에 섞여 있는 장점과 단점을 따로 볼 수 있도록 했다."],
+            ["jhgan/ko-sroberta-multitask", "문장 임베딩", "세그먼트를 의미 벡터로 바꾸어 유사한 표현을 비교했다."],
+            ["UMAP, HDBSCAN", "요인 후보 군집화", "비슷한 평가 표현을 묶어 평가 요인 후보를 확인했다."],
+            ["BERTopic", "최종 토픽 분석", "topic별 키워드와 대표 문장을 바탕으로 평가 요인을 해석했다."],
+            ["KoELECTRA", "감정분석", "세그먼트별 긍정·부정 방향을 분류했다."],
+            ["별점 신호", "만족도 비교 기준", "감정 정답 라벨이 아니라 텍스트 감정과 비교하는 보조 신호로 사용했다."],
+        ],
+        columns=["방법 또는 도구", "사용 방식", "분석에서의 역할"],
+    )
+    add_dataframe_table(doc, method_table, widths=[2500, 2100, 4760])
+    add_caption(doc, "표 1. 최종 분석에 사용한 방법과 역할")
     add_para(
         doc,
-        "최종본에서는 BERTopic 라이브러리를 직접 실행했다. 다만 BERTopic topic 이름은 자동 결론으로 그대로 확정하지 않고, "
-        "topic별 키워드와 대표 문장을 바탕으로 연구자가 평가 요인 이름을 해석했다. 이번 재분석에서는 outlier topic을 제외하고 574개의 평가 요인 topic이 생성되었다. "
+        "BERTopic은 최종 평가 요인 분석에 직접 사용했다. 다만 topic 이름은 자동 결과를 그대로 받아들이지 않고, "
+        "topic별 키워드와 대표 문장을 확인한 뒤 강의평 맥락에 맞게 해석했다. 이번 분석에서는 outlier topic을 제외하고 574개의 평가 요인 topic이 생성되었다. "
         "별점은 감정 정답 라벨이 아니라 전체 만족도 신호로만 사용했다.",
     )
 
@@ -400,7 +397,17 @@ def add_results(doc: Document, data: dict[str, pd.DataFrame]) -> None:
         "최종 분석 데이터는 전체 리뷰 13,751개와 세그먼트 37,808개로 구성되었다. 과목군별로는 글쓰기 세그먼트가 20,646개, "
         "실용영어 세그먼트가 17,162개였다.",
     )
-    add_dataframe_table(doc, data["overview"], widths=[2700, 2000, 2000, 2660])
+    overview_table = pd.DataFrame(
+        [
+            ["전체 리뷰 수", "13,751개", "분석에 사용한 전체 강의평 수"],
+            ["전체 세그먼트 수", "37,808개", "문장과 절 단위로 나눈 분석 단위"],
+            ["글쓰기 세그먼트 수", "20,646개", "글쓰기 계열 강의평에서 추출된 세그먼트"],
+            ["실용영어 세그먼트 수", "17,162개", "실용영어 계열 강의평에서 추출된 세그먼트"],
+            ["mixed review 수", "5,984개", "한 리뷰 안에 긍정과 부정 세그먼트가 함께 있는 경우"],
+        ],
+        columns=["항목", "수치", "해석"],
+    )
+    add_dataframe_table(doc, overview_table, widths=[2700, 1900, 4760])
     add_caption(doc, "표 2. 분석 데이터 개요")
     doc.add_picture(str(FIGURES_DIR / "fig02_segment_count_by_group.png"), width=Inches(5.8))
     add_caption(doc, "그림 2. 과목군별 세그먼트 수")
@@ -411,7 +418,14 @@ def add_results(doc: Document, data: dict[str, pd.DataFrame]) -> None:
         "세그먼트 감정분석 결과, 긍정 세그먼트는 22,263개로 전체의 58.88%였고 부정 세그먼트는 15,545개로 41.12%였다. "
         "긍정 세그먼트가 더 많지만, 부정 세그먼트도 4할 이상을 차지해 강의평 텍스트가 단순한 만족·불만의 한 방향으로만 구성되지 않음을 보여준다.",
     )
-    add_dataframe_table(doc, data["sentiment"], widths=[3000, 2100, 2100, 2160])
+    sentiment_table = pd.DataFrame(
+        [
+            ["긍정", "22,263개", "58.88%", "교수자의 태도, 설명, 피드백, 수업 운영에 대한 긍정 표현"],
+            ["부정", "15,545개", "41.12%", "과제·발표 부담, 평가 기준, 수업 운영 불만과 관련된 표현"],
+        ],
+        columns=["감정 방향", "세그먼트 수", "비율", "주요 의미"],
+    )
+    add_dataframe_table(doc, sentiment_table, widths=[1700, 1600, 1300, 4760])
     add_caption(doc, "표 3. 감정 분포 요약")
     doc.add_picture(str(FIGURES_DIR / "fig03_sentiment_distribution.png"), width=Inches(5.7))
     add_caption(doc, "그림 3. 전체 긍정/부정 세그먼트 분포")
@@ -423,7 +437,17 @@ def add_results(doc: Document, data: dict[str, pd.DataFrame]) -> None:
         "또한 높은 별점이지만 부정 세그먼트를 포함한 경우는 세그먼트 기준 9,694건, 낮은 별점이지만 긍정 세그먼트를 포함한 경우는 세그먼트 기준 975건이었다. "
         "이 항목은 세그먼트 기준과 리뷰 기준의 값이 다르게 계산되므로, 본 보고서에서는 두 기준을 구분해 기술한다.",
     )
-    add_dataframe_table(doc, data["mismatch"], widths=[3300, 1900, 1900, 2260])
+    mismatch_table = pd.DataFrame(
+        [
+            ["mixed review", "5,984개", "한 리뷰 안에 긍정과 부정 평가가 함께 나타난 경우"],
+            ["높은 별점의 부정 세그먼트", "9,694개", "전체 만족도는 높아도 과제, 평가, 운영에는 불만이 남을 수 있음을 보여줌"],
+            ["높은 별점의 부정 리뷰", "5,698개", "리뷰 기준으로 본 높은 별점 내부의 부정 언급 사례"],
+            ["낮은 별점의 긍정 세그먼트", "975개", "낮은 별점 리뷰 안에도 부분적으로 긍정 경험이 포함됨"],
+            ["낮은 별점의 긍정 리뷰", "602개", "리뷰 기준으로 본 낮은 별점 내부의 긍정 언급 사례"],
+        ],
+        columns=["항목", "수치", "해석"],
+    )
+    add_dataframe_table(doc, mismatch_table, widths=[3200, 1500, 4660])
     add_caption(doc, "표 4. 별점과 텍스트 불일치 요약")
     doc.add_picture(str(FIGURES_DIR / "fig04_rating_text_mismatch.png"), width=Inches(5.9))
     add_caption(doc, "그림 4. 별점과 텍스트 불일치 분석")
@@ -477,6 +501,11 @@ def add_discussion(doc: Document) -> None:
     )
     add_para(
         doc,
+        "이 결과는 대학생들이 강의를 선택할 때 온라인 강의평을 단순한 평점표가 아니라 경험 공유의 공간으로 활용한다는 점과도 연결된다. "
+        "짧은 리뷰 안에서도 수업 방식, 교수자의 응답 태도, 평가 기준, 과제 부담이 함께 언급되기 때문에, 강의평 데이터는 학생들이 수업을 어떻게 해석하고 비교하는지 보여주는 자료가 될 수 있다.",
+    )
+    add_para(
+        doc,
         "과목군 비교에서도 차이가 나타났다. 글쓰기 강의에서는 결과물을 제출하고 평가받는 과정 자체가 중요한 경험으로 드러났고, 실용영어 강의에서는 영어를 직접 사용해야 하는 참여 상황이 부담으로 나타났다. "
         "이 차이는 강의 개선 방향도 과목 성격에 맞춰 달라져야 함을 시사한다. 글쓰기 과목은 평가 기준과 피드백의 명확성이 중요하고, 실용영어 과목은 참여 부담을 낮추면서 실제 사용 경험을 설계하는 방식이 중요하다.",
     )
@@ -495,69 +524,8 @@ def add_limits(doc: Document) -> None:
     )
 
 
-def add_verification_submission(doc: Document) -> None:
-    add_heading(doc, "6. 최종 제출 및 검증 구성", 1)
-    add_para(
-        doc,
-        "최종 보고서의 핵심 수치와 분석 근거는 별도 GitHub 저장소에서 다시 계산할 수 있도록 정리했다. "
-        "저장소에는 실행 스크립트와 의존성 파일을 두고, 실행에 필요한 최종 분석 데이터는 별도 압축 파일로 제공한다.",
-    )
-
-    submission_df = pd.DataFrame(
-        [
-            ["최종 보고서", "final_report_안성민.docx", "연구 목적, 방법, 분석 결과, 해석을 담은 본문 문서"],
-            [
-                "검증용 GitHub",
-                "https://github.com/rntqkdl/everytime-lecture-review-verification",
-                "보고서 핵심 수치와 분석 근거 재계산",
-            ],
-            ["최종 분석 데이터", "final_analysis_data_안성민.zip", "검증 스크립트 실행에 필요한 데이터"],
-        ],
-        columns=["구분", "파일 또는 링크", "역할"],
-    )
-    add_dataframe_table(doc, submission_df, widths=[1900, 4300, 3160])
-    add_caption(doc, "표 6. 최종 제출 및 검증 구성")
-
-    add_para(doc, "검증 저장소 실행 순서는 다음과 같다.")
-    for command in [
-        "git clone https://github.com/rntqkdl/everytime-lecture-review-verification.git",
-        "cd everytime-lecture-review-verification",
-        "Expand-Archive -LiteralPath .\\final_analysis_data_안성민.zip -DestinationPath . -Force",
-        "python -m venv .venv",
-        ".\\.venv\\Scripts\\Activate.ps1",
-        "pip install -r requirements.txt",
-        "python scripts\\verify_report_evidence.py",
-    ]:
-        add_bullet(doc, command)
-
-    verification_df = pd.DataFrame(
-        [
-            ["보고서 핵심 수치 검증", "16개 중 16개 일치"],
-            ["전체 리뷰 수", "13,751개 일치"],
-            ["전체 세그먼트 수", "37,808개 일치"],
-            ["글쓰기 세그먼트 수", "20,646개 일치"],
-            ["실용영어 세그먼트 수", "17,162개 일치"],
-            ["긍정/부정 세그먼트 수와 비율", "일치"],
-            ["BERTopic topic 수와 outlier 세그먼트 수", "일치"],
-            ["Colab T4 감정분석 결과와 최종 분석 데이터", "일치"],
-            ["문장 임베딩 클러스터 결과와 최종 분석 데이터", "일치"],
-            ["기존 직접 병합 분석 결과와 최종 분석 데이터", "일치"],
-        ],
-        columns=["검증 항목", "결과"],
-    )
-    add_dataframe_table(doc, verification_df, widths=[4800, 4560])
-    add_caption(doc, "표 7. 최종 실행 검증 결과 요약")
-    add_para(
-        doc,
-        "실제 실행 결과 보고서에 작성한 핵심 수치 16개가 모두 재계산 결과와 일치했다. "
-        "검증 결과는 `outputs/evidence_verification/` 폴더에 생성되며, "
-        "`report_claim_validation.csv`, `groupwise_recalculated.csv`, `top_factors_recalculated.csv`, "
-        "`pipeline_evidence_checks.csv`, `evidence_file_inventory.csv`, `verification_summary.md`로 확인할 수 있다.",
-    )
-
-
 def add_references(doc: Document) -> None:
-    add_heading(doc, "7. 참고문헌", 1)
+    add_heading(doc, "6. 참고문헌", 1)
     refs = [
         "Campello, R. J. G. B., Moulavi, D., & Sander, J. (2013). Density-based clustering based on hierarchical density estimates. In Advances in Knowledge Discovery and Data Mining (pp. 160-172). Springer.",
         "Grootendorst, M. (2022). BERTopic: Neural topic modeling with a class-based TF-IDF procedure. arXiv. https://arxiv.org/abs/2203.05794",
@@ -577,17 +545,17 @@ def add_references(doc: Document) -> None:
 
 
 def add_appendix(doc: Document) -> None:
-    add_heading(doc, "8. 부록", 1)
+    add_heading(doc, "7. 부록", 1)
     add_para(
         doc,
-        "부록 자료는 공개 저장소의 코드와 분리해 로컬 분석 산출물로 정리했다. "
-        "원본 리뷰 데이터, HTML 원본, 브라우저 프로필, 캐시, 환경 파일은 개인정보와 재현 환경 보호를 위해 제외했다.",
+        "부록에는 최종 분석에 사용한 데이터와 재현 확인에 필요한 코드 위치를 정리했다. "
+        "개별 강의평 원문 대신 최종 분석 데이터와 집계 결과를 기준으로 확인할 수 있도록 구성했다.",
     )
-    add_bullet(doc, "`appendix/data`: 최종 분석 데이터셋, 최종 요인 요약, 과목군 비교, 검증표")
-    add_bullet(doc, "`appendix/figures`: 보고서용 그림 1부터 그림 8까지")
-    add_bullet(doc, "`appendix/tables`: 표 1부터 표 8까지의 CSV와 XLSX")
-    add_bullet(doc, "`appendix/code`: 최종 분석 스크립트, 보고서용 그래프 생성 스크립트, 노트북")
-    add_bullet(doc, "`appendix/validation`: 대표 문장 수동 검증, 수치 검증 요약, claim validation table")
+    add_bullet(doc, "최종 분석 데이터: `final_analysis_data_안성민.zip`")
+    add_bullet(doc, "검증용 저장소: `https://github.com/rntqkdl/everytime-lecture-review-verification`")
+    add_bullet(doc, "검증 스크립트: `scripts/verify_report_evidence.py`")
+    add_bullet(doc, "실행 검증 결과: 보고서 핵심 수치 16개 중 16개 일치")
+    add_bullet(doc, "대표 문장 검증 예시는 아래 그림에 정리했다.")
     doc.add_picture(str(FIGURES_DIR / "fig08_manual_validation_examples.png"), width=Inches(6.3))
     add_caption(doc, "그림 8. 대표 문장 검증 예시")
 
@@ -601,7 +569,6 @@ def main() -> None:
     add_results(doc, data)
     add_discussion(doc)
     add_limits(doc)
-    add_verification_submission(doc)
     add_references(doc)
     add_appendix(doc)
     doc.core_properties.title = "에브리타임 강의평 분석을 통해 본 좋은 강의의 조건"
