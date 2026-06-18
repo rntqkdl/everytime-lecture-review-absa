@@ -495,8 +495,69 @@ def add_limits(doc: Document) -> None:
     )
 
 
+def add_verification_submission(doc: Document) -> None:
+    add_heading(doc, "6. 최종 제출 및 검증 구성", 1)
+    add_para(
+        doc,
+        "최종 보고서의 핵심 수치와 분석 근거는 별도 GitHub 저장소에서 다시 계산할 수 있도록 정리했다. "
+        "저장소에는 실행 스크립트와 의존성 파일을 두고, 실행에 필요한 최종 분석 데이터는 별도 압축 파일로 제공한다.",
+    )
+
+    submission_df = pd.DataFrame(
+        [
+            ["최종 보고서", "final_report_안성민.docx", "연구 목적, 방법, 분석 결과, 해석을 담은 본문 문서"],
+            [
+                "검증용 GitHub",
+                "https://github.com/rntqkdl/everytime-lecture-review-verification",
+                "보고서 핵심 수치와 분석 근거 재계산",
+            ],
+            ["최종 분석 데이터", "final_analysis_data_안성민.zip", "검증 스크립트 실행에 필요한 데이터"],
+        ],
+        columns=["구분", "파일 또는 링크", "역할"],
+    )
+    add_dataframe_table(doc, submission_df, widths=[1900, 4300, 3160])
+    add_caption(doc, "표 6. 최종 제출 및 검증 구성")
+
+    add_para(doc, "검증 저장소 실행 순서는 다음과 같다.")
+    for command in [
+        "git clone https://github.com/rntqkdl/everytime-lecture-review-verification.git",
+        "cd everytime-lecture-review-verification",
+        "Expand-Archive -LiteralPath .\\final_analysis_data_안성민.zip -DestinationPath . -Force",
+        "python -m venv .venv",
+        ".\\.venv\\Scripts\\Activate.ps1",
+        "pip install -r requirements.txt",
+        "python scripts\\verify_report_evidence.py",
+    ]:
+        add_bullet(doc, command)
+
+    verification_df = pd.DataFrame(
+        [
+            ["보고서 핵심 수치 검증", "16개 중 16개 일치"],
+            ["전체 리뷰 수", "13,751개 일치"],
+            ["전체 세그먼트 수", "37,808개 일치"],
+            ["글쓰기 세그먼트 수", "20,646개 일치"],
+            ["실용영어 세그먼트 수", "17,162개 일치"],
+            ["긍정/부정 세그먼트 수와 비율", "일치"],
+            ["BERTopic topic 수와 outlier 세그먼트 수", "일치"],
+            ["Colab T4 감정분석 결과와 최종 분석 데이터", "일치"],
+            ["문장 임베딩 클러스터 결과와 최종 분석 데이터", "일치"],
+            ["기존 직접 병합 분석 결과와 최종 분석 데이터", "일치"],
+        ],
+        columns=["검증 항목", "결과"],
+    )
+    add_dataframe_table(doc, verification_df, widths=[4800, 4560])
+    add_caption(doc, "표 7. 최종 실행 검증 결과 요약")
+    add_para(
+        doc,
+        "실제 실행 결과 보고서에 작성한 핵심 수치 16개가 모두 재계산 결과와 일치했다. "
+        "검증 결과는 `outputs/evidence_verification/` 폴더에 생성되며, "
+        "`report_claim_validation.csv`, `groupwise_recalculated.csv`, `top_factors_recalculated.csv`, "
+        "`pipeline_evidence_checks.csv`, `evidence_file_inventory.csv`, `verification_summary.md`로 확인할 수 있다.",
+    )
+
+
 def add_references(doc: Document) -> None:
-    add_heading(doc, "6. 참고문헌", 1)
+    add_heading(doc, "7. 참고문헌", 1)
     refs = [
         "Campello, R. J. G. B., Moulavi, D., & Sander, J. (2013). Density-based clustering based on hierarchical density estimates. In Advances in Knowledge Discovery and Data Mining (pp. 160-172). Springer.",
         "Grootendorst, M. (2022). BERTopic: Neural topic modeling with a class-based TF-IDF procedure. arXiv. https://arxiv.org/abs/2203.05794",
@@ -516,7 +577,7 @@ def add_references(doc: Document) -> None:
 
 
 def add_appendix(doc: Document) -> None:
-    add_heading(doc, "7. 부록", 1)
+    add_heading(doc, "8. 부록", 1)
     add_para(
         doc,
         "부록 자료는 공개 저장소의 코드와 분리해 로컬 분석 산출물로 정리했다. "
@@ -540,6 +601,7 @@ def main() -> None:
     add_results(doc, data)
     add_discussion(doc)
     add_limits(doc)
+    add_verification_submission(doc)
     add_references(doc)
     add_appendix(doc)
     doc.core_properties.title = "에브리타임 강의평 분석을 통해 본 좋은 강의의 조건"
