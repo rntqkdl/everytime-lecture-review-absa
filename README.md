@@ -112,7 +112,7 @@ python make_submission_pack.py
 python scripts\build_final_report_docx.py
 ```
 
-BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다. `outputs/`는 GitHub 업로드 대상이 아니며, 최종 문서와 분석 산출물 압축본은 로컬 산출물로 별도 관리한다.
+BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다.
 
 ## 최종 산출물
 - `outputs/aspects/aspect_cluster_keywords.csv`
@@ -129,24 +129,7 @@ BERTopic 최종 산출물은 `outputs/bertopic_analysis/` 아래에 생성된다
 - `outputs/figures/rating_signal_vs_negative_ratio.png`
 - `sample_data/sample_reviews_anonymized.csv`
 
-## GitHub 업로드 금지
-다음은 업로드하지 않는다.
-
-- `.venv/`
-- `browser_profile/`
-- `data/`
-- `outputs/`
-- `sample_data/`
-- 로컬 분석 산출물 폴더
-- 최종 문서 파일
-- 분석 산출물 압축본
-- 실제 강의평 원문
-- HTML 원본
-- debug 파일
-- 교수명 매핑 파일
-- Colab 모델 가중치
-- 분석 결과 CSV/XLSX/PNG/PDF
-
+## 저장소 구성
 업로드 가능:
 - 분석 코드
 - `README.md`
