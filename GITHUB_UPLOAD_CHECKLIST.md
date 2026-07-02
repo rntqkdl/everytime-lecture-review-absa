@@ -25,6 +25,7 @@
 - `data/`, `outputs/`, `sample_data/`
 - `submission_pack_안성민/`
 - `appendix_안성민.zip`, `submission_pack_안성민.zip`
+- `evidence_verification_data_안성민/`, `evidence_verification_data_안성민.zip`
 - 원본 리뷰 CSV, 분석 결과 CSV/XLSX/PNG, HTML 원본, 로그, 임시 파일
 - `config/project_config.yaml`, `.env`, `.env.*`
 
@@ -37,7 +38,7 @@ git status --short
 ```powershell
 git status --short
 git ls-files data outputs sample_data colab_upload browser_profile
-git status --short | Select-String -Pattern '\.csv|\.xlsx|\.png|\.html|\.log|project_config\.yaml|submission_pack|appendix_'
+git status --short | Select-String -Pattern '\.csv|\.xlsx|\.png|\.html|\.log|project_config\.yaml|submission_pack|appendix_|evidence_verification_data'
 ```
 
 ## 5. 커밋 전 확인 체크리스트
@@ -45,7 +46,7 @@ git status --short | Select-String -Pattern '\.csv|\.xlsx|\.png|\.html|\.log|pro
 - [ ] `data/`, `outputs/`, `sample_data/`, `browser_profile/`가 staged 상태가 아니다.
 - [ ] CSV/XLSX/PNG/HTML/LOG 파일이 staged 상태가 아니다.
 - [ ] `config/project_config.yaml` 대신 `config/project_config.example.yaml`만 staged 상태다.
-- [ ] 제출용 zip은 GitHub가 아니라 교수님 제출용으로만 보관한다.
+- [ ] 로컬 산출물 zip은 공개 코드 저장소에 포함하지 않는다.
 - [ ] tracked notebook에 저장된 실행 output이 없는지 확인했다.
 
 ## 6. 권장 커밋 메시지

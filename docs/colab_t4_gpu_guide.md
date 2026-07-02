@@ -24,7 +24,7 @@ python scripts/run_segment_absa_pipeline.py --pre-colab-only
 다운로드한 결과 CSV는 로컬의 다음 폴더에 넣는다.
 
 ```text
-C:\every_time\outputs\colab_results
+outputs/colab_results
 ```
 
 필수 결과:

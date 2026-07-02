@@ -23,6 +23,7 @@
 ## 7. config/project_config.yaml 제외 여부
 - [ ] `config/project_config.yaml`은 제외하고 `config/project_config.example.yaml`만 올린다.
 
-## 8. 교수님 제출용 appendix 안내
+## 8. 최종 문서와 검증 데이터 제외
 - [ ] `submission_pack_안성민/`, `appendix_안성민.zip`, `submission_pack_안성민.zip`은 GitHub에 올리지 않는다.
-- [ ] 교수님 제출용 최종 파일은 GitHub가 아니라 `appendix_안성민.zip`과 `final_report_안성민.docx`다.
+- [ ] `evidence_verification_data_안성민/`, `evidence_verification_data_안성민.zip`은 공개 코드 저장소에 올리지 않는다.
+- [ ] 최종 문서와 로컬 산출물 압축본은 공개 코드 저장소와 분리해 관리한다.

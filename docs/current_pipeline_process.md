@@ -2,7 +2,7 @@
 
 ## 로컬 CPU 1차
 ```powershell
-cd C:\every_time
+cd <프로젝트_폴더>
 .\.venv\Scripts\Activate.ps1
 
 python scripts/01_merge_scraped_outputs.py

@@ -4,7 +4,7 @@ Everytime lecture review ABSA report analysis script
 
 목적
 - Colab GPU 모델 실행 결과와 로컬 후처리 결과를 바탕으로
-  보고서 제출용 결론, 표, 그래프, 요약 문장을 자동 생성한다.
+  최종 보고서용 결론, 표, 그래프, 요약 문장을 자동 생성한다.
 
 실행 위치
     C:\every_time

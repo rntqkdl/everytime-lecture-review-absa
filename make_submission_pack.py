@@ -66,7 +66,7 @@ EXPECTED_FILES = {
     "low_rating_positive_segments": ["low_rating_positive_segments_for_report.csv", "low_rating_positive_segments.csv"],
 }
 
-PRESENTATION_CLAIMS = {
+REPORT_BASELINE_CLAIMS = {
     "전체 리뷰 수": 13751,
     "전체 세그먼트 수": 37808,
     "글쓰기 세그먼트 수": 20646,
@@ -76,8 +76,8 @@ PRESENTATION_CLAIMS = {
     "긍정 비율": 58.88,
     "부정 세그먼트 수": 15545,
     "부정 비율": 41.12,
-    "높은 별점의 부정 세그먼트 수": 5698,
-    "낮은 별점의 긍정 세그먼트 수": 602,
+    "높은 별점의 부정 세그먼트 수": 9694,
+    "낮은 별점의 긍정 세그먼트 수": 975,
 }
 
 TABLE_SPECS = [
@@ -445,7 +445,7 @@ def build_validation_table(metrics: dict[str, Metric]) -> pd.DataFrame:
     ]
     for key in validation_order:
         metric = metrics[key]
-        expected = PRESENTATION_CLAIMS[key]
+        expected = REPORT_BASELINE_CLAIMS[key]
         if not metric.available:
             match = "계산 불가"
             diff_text = "계산 불가"
@@ -459,7 +459,7 @@ def build_validation_table(metrics: dict[str, Metric]) -> pd.DataFrame:
         rows.append(
             {
                 "검증 항목": key,
-                "발표자료 수치": format_value(expected, metric.percent),
+                "보고서 기준 수치": format_value(expected, metric.percent),
                 "실제 데이터 수치": format_value(metric.value, metric.percent),
                 "일치 여부": match,
                 "차이": diff_text,
@@ -492,10 +492,10 @@ def comparison_note(validation_df: pd.DataFrame, key: str) -> str:
         return ""
     item = row.iloc[0]
     if item["일치 여부"] == "일치":
-        return "발표자료와 일치"
+        return "보고서 기준과 일치"
     if item["일치 여부"] == "계산 불가":
         return "계산 불가"
-    return f"발표자료 대비 {item['차이']}"
+    return f"보고서 기준 대비 {item['차이']}"
 
 
 def create_tables(metrics: dict[str, Metric], validation_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -524,7 +524,7 @@ def create_tables(metrics: dict[str, Metric], validation_df: pd.DataFrame) -> di
         [
             {
                 "항목": key,
-                "발표자료 수치": format_value(PRESENTATION_CLAIMS[key], metrics[key].percent),
+                "보고서 기준 수치": format_value(REPORT_BASELINE_CLAIMS[key], metrics[key].percent),
                 "실제 데이터 수치": format_value(metrics[key].value, metrics[key].percent),
                 "비고": comparison_note(validation_df, key),
             }
@@ -537,7 +537,7 @@ def create_tables(metrics: dict[str, Metric], validation_df: pd.DataFrame) -> di
         [
             {
                 "항목": key,
-                "발표자료 수치": format_value(PRESENTATION_CLAIMS[key], metrics[key].percent),
+                "보고서 기준 수치": format_value(REPORT_BASELINE_CLAIMS[key], metrics[key].percent),
                 "실제 데이터 수치": format_value(metrics[key].value, metrics[key].percent),
                 "비고": comparison_note(validation_df, key),
             }
@@ -550,7 +550,7 @@ def create_tables(metrics: dict[str, Metric], validation_df: pd.DataFrame) -> di
         [
             {
                 "항목": key,
-                "발표자료 수치": format_value(PRESENTATION_CLAIMS[key], metrics[key].percent),
+                "보고서 기준 수치": format_value(REPORT_BASELINE_CLAIMS[key], metrics[key].percent),
                 "실제 데이터 수치": format_value(metrics[key].value, metrics[key].percent),
                 "비고": metrics[key].note or comparison_note(validation_df, key),
             }
@@ -898,7 +898,7 @@ def validation_summary_markdown(validation_df: pd.DataFrame, metrics: dict[str, 
         if df.empty:
             return "- 없음"
         return "\n".join(
-            f"- {row['검증 항목']}: 발표자료 {row['발표자료 수치']} / 실제 {row['실제 데이터 수치']} / 차이 {row['차이']}"
+            f"- {row['검증 항목']}: 보고서 기준 {row['보고서 기준 수치']} / 실제 {row['실제 데이터 수치']} / 차이 {row['차이']}"
             for _, row in df.iterrows()
         )
 
@@ -910,17 +910,17 @@ def validation_summary_markdown(validation_df: pd.DataFrame, metrics: dict[str, 
     high_review_note = used.get("high_neg_reviews")
     low_review_note = used.get("low_pos_reviews")
     correction_note = (
-        "- 높은 별점의 부정 항목은 세그먼트 기준 9,694건으로 계산된다. 발표자료의 5,698건은 unique review 기준과 일치하므로, 세그먼트 수로 쓸 경우 9,694건으로 고치고 review 수로 쓸 경우 항목명을 '높은 별점 안의 부정 리뷰 수'로 바꾸는 것이 적절하다.\n"
-        "- 낮은 별점의 긍정 항목은 세그먼트 기준 975건으로 계산된다. 발표자료의 602건은 unique review 기준과 일치하므로, 세그먼트 수로 쓸 경우 975건으로 고치고 review 수로 쓸 경우 항목명을 '낮은 별점 안의 긍정 리뷰 수'로 바꾸는 것이 적절하다."
+        "- 높은 별점의 부정 항목은 세그먼트 기준 9,694건, unique review 기준 5,698건으로 계산된다. 보고서에는 어떤 기준의 수치인지 구분해 적는다.\n"
+        "- 낮은 별점의 긍정 항목은 세그먼트 기준 975건, unique review 기준 602건으로 계산된다. 보고서에는 어떤 기준의 수치인지 구분해 적는다."
     )
     if high_review_note is None or low_review_note is None:
         correction_note = "- 별점/감정 불일치 항목은 계산 가능 컬럼 기준으로 보고서 수치를 확정해야 한다."
 
-    return f"""# 발표자료 수치 검증 요약
+    return f"""# 최종 보고서 수치 검증 요약
 
 생성일: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
-## 1. 검증한 발표자료 수치 목록
+## 1. 검증한 보고서 기준 수치 목록
 {bullet_rows(validation_df)}
 
 ## 2. 일치한 항목
@@ -933,14 +933,14 @@ def validation_summary_markdown(validation_df: pd.DataFrame, metrics: dict[str, 
 {bullet_rows(unavailable)}
 
 ## 5. 불일치 항목에 대한 조치
-- 발표자료 수치와 실제 데이터 계산 결과가 다르면 실제 데이터 기준으로 표와 그래프를 생성했다.
+- 보고서 기준 수치와 실제 데이터 계산 결과가 다르면 실제 데이터 기준으로 표와 그래프를 생성했다.
 - 별점과 텍스트 불일치 항목은 세그먼트 기준과 review 기준을 구분해 기록했다.
 - 검증 상세는 `report_assets/tables/claim_validation_table.csv`와 `claim_validation_table.xlsx`에 저장했다.
 
 ## 6. 최종 레포트에 사용할 권장 수치
 {recommended}
 
-## 7. 발표자료 수정이 필요한 부분
+## 7. 기준 단위 확인이 필요한 부분
 {correction_note}
 
 ## 사용한 핵심 입력 파일
@@ -955,16 +955,16 @@ def validation_summary_markdown(validation_df: pd.DataFrame, metrics: dict[str, 
 
 def readme_submission_markdown(validation_df: pd.DataFrame, figure_notes: list[str]) -> str:
     validation_summary = "\n".join(
-        f"- {row['검증 항목']}: 발표자료 {row['발표자료 수치']} / 실제 {row['실제 데이터 수치']} / {row['일치 여부']}"
+        f"- {row['검증 항목']}: 보고서 기준 {row['보고서 기준 수치']} / 실제 {row['실제 데이터 수치']} / {row['일치 여부']}"
         for _, row in validation_df.iterrows()
     )
     table_list = "\n".join(f"- {title}: `report_assets/tables/{stem}.csv`, `.xlsx`" for stem, title in TABLE_SPECS)
     figure_list = "\n".join(f"- {title}: `report_assets/figures/{filename}`" for filename, title in FIGURE_SPECS)
     note_text = "\n".join(f"- {note}" for note in figure_notes) if figure_notes else "- 기본 대체 없이 사용 가능한 outputs 파일을 기반으로 생성했다."
-    return f"""# 안성민 에브리타임 강의평 분석 제출 패키지
+    return f"""# 안성민 에브리타임 강의평 분석 산출물
 
-## 1. 제출물 개요
-이 폴더는 에브리타임 강의평 분석 보고서에 넣을 표, 그림, 검증 결과, 부록 자료를 GitHub 업로드용 코드와 분리해 정리한 교수님 제출용 패키지다.
+## 1. 산출물 개요
+이 폴더는 에브리타임 강의평 분석 보고서에 사용하는 표, 그림, 검증 결과, 부록 자료를 공개 코드 저장소와 분리해 정리한 로컬 산출물이다.
 
 ## 2. 폴더 구조
 - `report_assets/tables`: 보고서 본문에 넣을 표와 검증표
@@ -993,15 +993,15 @@ def readme_submission_markdown(validation_df: pd.DataFrame, figure_notes: list[s
 - `appendix/validation/report_validation_summary.md`
 - `appendix/validation/claim_validation_table.csv`
 
-## 6. 발표자료 수치 검증 결과 요약
+## 6. 최종 보고서 수치 검증 결과 요약
 {validation_summary}
 
 ## 7. 보고서에서 제외한 불필요한 파일 기준
 - 원본 리뷰 데이터, HTML 원본, 브라우저 프로필, 캐시, 가상환경은 보고서 본문과 GitHub 업로드 대상에서 제외한다.
-- 분석 결과 CSV/XLSX/PNG는 GitHub 업로드용 코드 저장소에 올리지 않고 제출 패키지와 appendix zip에만 포함한다.
+- 분석 결과 CSV/XLSX/PNG는 공개 코드 저장소에 올리지 않고 로컬 산출물 압축본에만 포함한다.
 - `config/project_config.yaml`은 개인 로컬 경로와 실행 설정을 포함할 수 있으므로 `config/project_config.example.yaml`만 공개한다.
 
-## 8. 교수님께 제출할 최종 파일 목록
+## 8. 최종 관리 파일 목록
 - `appendix_안성민.zip`
 - `submission_pack_안성민.zip`
 - 최종 보고서 문서: `final_report_안성민.docx`
@@ -1045,6 +1045,7 @@ def github_upload_checklist_markdown() -> str:
 - `data/`, `outputs/`, `sample_data/`
 - `submission_pack_안성민/`
 - `appendix_안성민.zip`, `submission_pack_안성민.zip`
+- `evidence_verification_data_안성민/`, `evidence_verification_data_안성민.zip`
 - 원본 리뷰 CSV, 분석 결과 CSV/XLSX/PNG, HTML 원본, 로그, 임시 파일
 - `config/project_config.yaml`, `.env`, `.env.*`
 
@@ -1057,7 +1058,7 @@ git status --short
 ```powershell
 git status --short
 git ls-files data outputs sample_data colab_upload browser_profile
-git status --short | Select-String -Pattern '\\.csv|\\.xlsx|\\.png|\\.html|\\.log|project_config\\.yaml|submission_pack|appendix_'
+git status --short | Select-String -Pattern '\\.csv|\\.xlsx|\\.png|\\.html|\\.log|project_config\\.yaml|submission_pack|appendix_|evidence_verification_data'
 ```
 
 ## 5. 커밋 전 확인 체크리스트
@@ -1065,7 +1066,7 @@ git status --short | Select-String -Pattern '\\.csv|\\.xlsx|\\.png|\\.html|\\.lo
 - [ ] `data/`, `outputs/`, `sample_data/`, `browser_profile/`가 staged 상태가 아니다.
 - [ ] CSV/XLSX/PNG/HTML/LOG 파일이 staged 상태가 아니다.
 - [ ] `config/project_config.yaml` 대신 `config/project_config.example.yaml`만 staged 상태다.
-- [ ] 제출용 zip은 GitHub가 아니라 교수님 제출용으로만 보관한다.
+- [ ] 로컬 산출물 zip은 공개 코드 저장소에 포함하지 않는다.
 - [ ] tracked notebook에 저장된 실행 output이 없는지 확인했다.
 
 ## 6. 권장 커밋 메시지
@@ -1101,9 +1102,10 @@ def data_exclusion_checklist_markdown() -> str:
 ## 7. config/project_config.yaml 제외 여부
 - [ ] `config/project_config.yaml`은 제외하고 `config/project_config.example.yaml`만 올린다.
 
-## 8. 교수님 제출용 appendix 안내
+## 8. 최종 문서와 검증 데이터 제외
 - [ ] `submission_pack_안성민/`, `appendix_안성민.zip`, `submission_pack_안성민.zip`은 GitHub에 올리지 않는다.
-- [ ] 교수님 제출용 최종 파일은 GitHub가 아니라 `appendix_안성민.zip`과 `final_report_안성민.docx`다.
+- [ ] `evidence_verification_data_안성민/`, `evidence_verification_data_안성민.zip`은 공개 코드 저장소에 올리지 않는다.
+- [ ] 최종 문서와 로컬 산출물 압축본은 공개 코드 저장소와 분리해 관리한다.
 """
 
 
@@ -1136,7 +1138,7 @@ def build_exclusion_inventory() -> pd.DataFrame:
         ("data", "raw/private review data"),
         ("outputs", "analysis results and derived files"),
         ("sample_data", "sample data files excluded per submission rule"),
-        (PACK_NAME, "professor submission package"),
+        (PACK_NAME, "local analysis artifact package"),
         ("config/project_config.yaml", "local/private config"),
     ]
     rows = []
@@ -1197,9 +1199,32 @@ def organize_appendix(
     copy_file(validation_csv, APPENDIX_SUBDIRS["validation"] / "claim_validation_table.csv", missing, "claim validation table validation copy")
     copy_file(summary_path, APPENDIX_SUBDIRS["validation"] / "report_validation_summary.md", missing, "report validation summary appendix copy")
     copy_file(discovered.get("manual_validation_7_samples"), APPENDIX_SUBDIRS["validation"] / "manual_validation_7_samples.csv", missing, "manual validation samples")
+    methodology_docs = [
+        PROJECT_ROOT / "docs" / "methodology_reference_summary.md",
+        PROJECT_ROOT / "docs" / "methodology_writeup_for_report.md",
+        PROJECT_ROOT / "docs" / "methodology_caution_notes.md",
+        PROJECT_ROOT / "docs" / "apa_references_for_report.md",
+    ]
+    for doc_path in methodology_docs:
+        copy_file(doc_path, APPENDIX_SUBDIRS["validation"] / doc_path.name, missing, f"methodology document {doc_path.name}")
+    copy_file(
+        PROJECT_ROOT / "docs" / "methodology_reference_table.csv",
+        APPENDIX_SUBDIRS["tables"] / "methodology_reference_table.csv",
+        missing,
+        "methodology reference table csv",
+    )
+    copy_file(
+        PROJECT_ROOT / "docs" / "methodology_reference_table.xlsx",
+        APPENDIX_SUBDIRS["tables"] / "methodology_reference_table.xlsx",
+        missing,
+        "methodology reference table xlsx",
+    )
 
     code_targets = [
         PROJECT_ROOT / "make_submission_pack.py",
+        PROJECT_ROOT / "scripts" / "18_run_bertopic_report_analysis.py",
+        PROJECT_ROOT / "scripts" / "build_final_report_docx.py",
+        PROJECT_ROOT / "scripts" / "make_methodology_reference_summary.py",
         PROJECT_ROOT / "scripts" / "run_segment_absa_pipeline.py",
         PROJECT_ROOT / "scripts" / "10_visualize_results.py",
         PROJECT_ROOT / "scripts" / "13_generate_report_analysis_direct_colab.py",
@@ -1238,7 +1263,7 @@ def create_zip(source_dir: Path, zip_path: Path) -> None:
 
 def print_summary(discovered: dict[str, Path | None], validation_df: pd.DataFrame, missing: list[str]) -> None:
     print("생성 완료")
-    print(f"- 제출 패키지: {PACK_DIR}")
+    print(f"- 산출물 폴더: {PACK_DIR}")
     print(f"- appendix zip: {PROJECT_ROOT / 'appendix_안성민.zip'}")
     print(f"- submission zip: {PROJECT_ROOT / 'submission_pack_안성민.zip'}")
     print(f"- 검증표: {TABLES_DIR / 'claim_validation_table.csv'}")

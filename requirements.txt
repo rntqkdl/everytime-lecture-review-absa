@@ -13,6 +13,11 @@ PyYAML
 scikit-learn
 kiwipiepy
 matplotlib
+python-docx
+bertopic
+sentence-transformers
+umap-learn
+hdbscan
 
 # Colab / optional local model inference
 transformers
